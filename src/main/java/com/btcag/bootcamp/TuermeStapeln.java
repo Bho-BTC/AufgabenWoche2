@@ -2,7 +2,7 @@ package com.btcag.bootcamp;
 import java.util.Scanner;
 public class TuermeStapeln {
     public static void turmVerlegen (int hoehe){
-        int scheibe1
+
 
     }
 
