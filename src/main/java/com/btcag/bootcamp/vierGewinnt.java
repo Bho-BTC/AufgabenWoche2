@@ -4,9 +4,8 @@ import java.util.Scanner;
 
 public class vierGewinnt {
     public static String[] playerNames = getNames();
-    public static String[][] field = new String[7][6];
-
-
+    public static String[][] field = new String[6][7];
+    public static int turnCount = 0;
     //------------------------------------------------------Namen abfragen-------------------------------------------------------------------
     public static String[] getNames() {
         Scanner scanner = new Scanner(System.in);
@@ -32,11 +31,10 @@ public class vierGewinnt {
     //--------------------------------------------------Spielfeld ausgeben------------------------------------------------------------------
     public static void drawField() {
         int rowCount = 0;
-        int maxRow = 7;
-        int maxColumn = 6;
+        int maxRow = 6;
+        int maxColumn = 7;
         while (rowCount < maxRow) {
             int columnCount = 0;
-            System.out.println();
             while (columnCount < maxColumn) {
                 if (field[rowCount][columnCount] == "x") {
                     System.out.print("[ x ]  ");
@@ -47,27 +45,35 @@ public class vierGewinnt {
                 }
                 columnCount++;
             }
+            System.out.println();
             rowCount++;
         }
     }
 
     //-------------------------------------------spielen aka turn aufrufen-----------------------------------------------------------
     public static String play(String[] playerNames) {
-        int turnCount = 0;
+
         String player1 = playerNames[0];
         String player2 = playerNames[1];
         String winner = "";
-        boolean gameWon = false;
+
+        if (!checkWin()) {
+
+            if (turnCount % 2 == 0) {
+                turnCount++;
+                turn(player1);
+            } else {
+                turnCount++;
+                turn(player2);
+            }
+        }
 
         if (turnCount % 2 == 0) {
-            turn(player1);
-            turnCount++;
+            winner = player2;
         } else {
-            turn(player2);
-            turnCount++;
+            winner = player1;
         }
         return winner;
-
     }
 
     public static boolean oneOrTwo = true;
@@ -76,16 +82,17 @@ public class vierGewinnt {
     public static void turn(String playerName) {
         Scanner scanner = new Scanner(System.in);
         int chipColumn;
-        if (oneOrTwo) { //turn für spieler 1
-            int rowNbr = -1;
+        int rowNbr = -1;
+        if (oneOrTwo) { //turn für Spieler 1
             boolean columnFree;
             do {
                 do {
                     System.out.println(playerName + " in welche Spalte wollen wollen sie Ihren Chip setzen?");
                     chipColumn = scanner.nextInt();
                     columnFree = true;
-                } while (chipColumn < 1 || chipColumn > 6);
-                for (int i = 0; i < 7; i++) {
+                } while (chipColumn < 1 || chipColumn > 7);
+
+                for (int i = 0; i < 6; i++) {
                     if (field[i][(chipColumn - 1)] != "x" && field[i][(chipColumn - 1)] != "o") {
                         rowNbr = i;
                     }
@@ -96,18 +103,16 @@ public class vierGewinnt {
             } while (!columnFree);
 
             field[rowNbr][(chipColumn - 1)] = "x";
-            oneOrTwo = (!oneOrTwo);
         } else {
-            int rowNbr = -1;
             boolean columnFree;
             do {
                 do {
                     System.out.println(playerName + " in welche Spalte wollen wollen sie Ihren Chip setzen?");
                     chipColumn = scanner.nextInt();
                     columnFree = true;
-                } while (chipColumn < 1 || chipColumn > 6);
+                } while (chipColumn < 1 || chipColumn > 7);
 
-                for (int i = 0; i < 7; i++) {
+                for (int i = 0; i < 6; i++) {
                     if (field[i][(chipColumn - 1)] != "x" && field[i][(chipColumn - 1)] != "o") {
                         rowNbr = i;
                     }
@@ -118,32 +123,55 @@ public class vierGewinnt {
             } while (!columnFree);
 
             field[rowNbr][(chipColumn - 1)] = "o";
-            oneOrTwo = (!oneOrTwo);
         }
+        oneOrTwo = (!oneOrTwo);
         drawField();
-
-
         play(playerNames);
-
-
     }
-
+    //------------------------------------------------------Check Win-----------------------------------------------------------------------
     public static boolean checkWin() {
+        String[] players = {"x", "o"};
 
-        for (int i = 0; i < 7; i++) {
-
+        for (String player : players) {
+            //---------------------------------------Check horizontal-------------------------------------------------------------------
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (field[i][j] == player && field[i][j + 1] == player && field[i][j + 2] == player && field[i][j + 3] == player) {
+                        return true;
+                    }
+                }
+            }
+            //----------------------------------------Check vertikal---------------------------------------------------------------------
+            for (int i = 0; i < 7; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (field[j][i] == player && field[j + 1][i] == player && field[j + 2][i] == player && field[j + 3][i] == player) {
+                        return true;
+                    }
+                }
+            }
+            //----------------------------------------Check oben link nach unten rechts------------------------------------------------------------
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (field[i][j] == player && field[i + 1][j + 1] == player && field[i + 2][j + 2] == player && field[i + 3][j + 3] == player) {
+                        return true;
+                    }
+                }
+            }
+            //---------------------------------------------Check unten links nach oben rechts-------------------------------------------------
+            for (int i = 3; i < 6; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (field[i][j] == player && field[i - 1][j + 1] == player && field[i - 2][j + 2] == player && field[i - 3][j + 3] == player) {
+                        return true;
+                    }
+                }
+            }
         }
-
+        return false;
     }
-
 
     public static void main(String[] args) {
         System.out.println(playerNames[0] + "                                       " + playerNames[1]);
         drawField();
-        play(playerNames);
-
-
+        System.out.println("Der Spieler: " + play(playerNames) + " hat das Spiel in " + turnCount + " Zügen gewonnen.");
     }
-
-
 }
