@@ -55,7 +55,7 @@ public class vierGewinnt {
 
         String player1 = playerNames[0];
         String player2 = playerNames[1];
-        String winner = "";
+        String winner;
 
         if (!checkWin()) {
 
